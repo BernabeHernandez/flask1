@@ -1,5 +1,0 @@
-runtime: python
-build:
-  python_version: "3.12"
-  install_command:
-    - apt-get update -y && apt-get install -y build-essential python3-dev
