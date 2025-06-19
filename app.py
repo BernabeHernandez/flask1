@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 import joblib
 import pandas as pd
 import logging
+import numpy as np
 
 app = Flask(__name__)
 
@@ -11,6 +12,10 @@ logging.basicConfig(level=logging.DEBUG)
 # Cargar el modelo entrenado
 model = joblib.load('modelo_entrenado_insectos.pkl')
 app.logger.debug('Modelo cargado correctamente.')
+
+
+mean_values = np.array([4.4, 5.17])  
+std_values = np.array([3.05, 2.65]) 
 
 @app.route('/')
 def home():
@@ -27,8 +32,13 @@ def predict():
         data_df = pd.DataFrame([[abdomen, antenna]], columns=['abdomen', 'antenna'])
         app.logger.debug(f'DataFrame creado: {data_df}')
 
+
+        data_array = data_df.values
+        data_scaled = (data_array - mean_values) / std_values
+        app.logger.debug(f'Datos normalizados: {data_scaled}')
+
         # Realizar predicciones
-        prediction = model.predict(data_df)
+        prediction = model.predict(data_scaled)
         app.logger.debug(f'Predicción: {prediction[0]}')
 
         # Devolver las predicciones como respuesta JSON
